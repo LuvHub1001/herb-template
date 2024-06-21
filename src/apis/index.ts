@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "",
@@ -29,18 +29,26 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-export const get = async (url: string, config: any = null) => {
+export const get = async (url: string, config?: AxiosRequestConfig) => {
   return await axiosInstance.get(url, config);
 };
 
-export const post = async (url: string, data: Response, config: any) => {
+export const post = async (
+  url: string,
+  data: any,
+  config?: AxiosRequestConfig,
+) => {
   return await axiosInstance.post(url, data, config);
 };
 
-export const patch = async (url: string, data: Response, config: any) => {
+export const patch = async (
+  url: string,
+  data: Request,
+  config: AxiosRequestConfig,
+) => {
   return await axiosInstance.patch(url, data, config);
 };
 
-export const del = async (url: string, config: any) => {
+export const del = async (url: string, config?: AxiosRequestConfig) => {
   return await axiosInstance.delete(url, config);
 };
