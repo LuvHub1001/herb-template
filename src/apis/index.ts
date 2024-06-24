@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "",
+  baseURL: "https://fakestoreapi.com/",
   timeout: 3000,
   headers: {
     "Content-Type": "application.json",
