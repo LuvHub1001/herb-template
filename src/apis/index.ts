@@ -1,8 +1,13 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+const AXIOS_TIMEOUT = 3000;
+const RETRY_TIMEOUT = 500;
+const RETRY_MAX_COUNT = 3;
+let RETRY_COUNT = 0;
+
 const axiosInstance = axios.create({
   baseURL: "https://fakestoreapi.com/",
-  timeout: 3000,
+  timeout: AXIOS_TIMEOUT,
   headers: {
     "Content-Type": "application.json",
   },
@@ -51,4 +56,10 @@ export const patch = async (
 
 export const del = async (url: string, config?: AxiosRequestConfig) => {
   return await axiosInstance.delete(url, config);
+};
+
+const backoffRequest = async (times: number, config: AxiosRequestConfig) => {
+  setTimeout(async () => {
+    axiosInstance.request(config);
+  }, times);
 };
