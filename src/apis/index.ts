@@ -43,9 +43,41 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (res) => {
+    RETRY_COUNT = 3;
     return res;
   },
   (err: Error | null) => {
+    if (isAxiosError(err)) {
+      switch (err.response?.status) {
+        case HttpStatusCode.NotFound:
+          console.log(
+            `CANNOT FOUND END POINT <RES> :: ${err.config?.baseURL} ${err.config?.url}`,
+          );
+          break;
+        case HttpStatusCode.BadRequest:
+          console.log(`BAD REQUEST <RES> :: ${err.config?.data}`);
+          break;
+        case HttpStatusCode.Unauthorized:
+          console.log(`Unauthroized <RES> :: ${err.config?.headers}`);
+          break;
+        case HttpStatusCode.Forbidden:
+          console.log(`Forbidden <RES> :: ${err.config?.headers}`);
+          break;
+        case HttpStatusCode.BadGateway:
+          while (RETRY_COUNT++ < RETRY_MAX_COUNT) {
+            backoffRequest(
+              RETRY_COUNT * RETRY_TIMEOUT,
+              err.config as InternalAxiosRequestConfig,
+            );
+          }
+          break;
+        default:
+          console.log(`Axios Error <RES> :: ${err.status} ${err.message}`);
+          break;
+      }
+    } else {
+      throw err;
+    }
     return Promise.reject(err);
   },
 );
