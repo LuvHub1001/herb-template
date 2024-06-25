@@ -1,4 +1,9 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosRequestConfig,
+  HttpStatusCode,
+  InternalAxiosRequestConfig,
+  isAxiosError,
+} from "axios";
 
 const AXIOS_TIMEOUT = 3000;
 const RETRY_TIMEOUT = 500;
@@ -20,7 +25,18 @@ axiosInstance.interceptors.request.use(
     }
     return req;
   },
-  (err: Error | null) => {
+  (err: Error) => {
+    if (isAxiosError(err)) {
+      if (err.status === HttpStatusCode.NotFound) {
+        console.log(
+          `CANNOT FOUND END POINT <REQ> :: ${err.config?.baseURL} ${err.config?.url}`,
+        );
+      } else if (err.status === HttpStatusCode.BadRequest) {
+        console.log(`BAD REQUEST <REQ> :: ${err.config?.data}`);
+      } else {
+        throw err;
+      }
+    }
     return Promise.reject(err);
   },
 );
